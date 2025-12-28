@@ -1,0 +1,15 @@
+services:
+  vortex-db:
+    image: postgres:15-alpine
+    container_name: vortex-postgres
+    environment:
+      - POSTGRES_DB=vortex_db
+      - POSTGRES_USER=aitijhya
+      - POSTGRES_PASSWORD=aitijhya
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_volume:/var/lib/postgresql/data
+
+volumes:
+  postgres_volume:

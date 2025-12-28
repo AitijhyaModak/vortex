@@ -1,0 +1,7 @@
+.DS_STORE
+*.sql
+launch.json
+settings.json
+aitijhyamodak
+target
+.vscode
