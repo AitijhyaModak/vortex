@@ -1,6 +1,7 @@
 package com.aitijhya.vortex.controllers;
 
 import com.aitijhya.vortex.entities.MediaAsset;
+import com.aitijhya.vortex.exceptions.InvalidFileType;
 import com.aitijhya.vortex.repositories.MediaRepository;
 import com.aitijhya.vortex.services.FileStorageService;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,7 @@ public class VideoUploadController {
 
 
     @PostMapping("/upload")
-    private ResponseEntity<MediaAsset> uploadVideo(@RequestParam("file") MultipartFile file) {
+    private ResponseEntity<String> uploadVideo(@RequestParam("file") MultipartFile file) {
         if (file.isEmpty()) {
             return ResponseEntity.badRequest().build();
         }
@@ -38,13 +39,17 @@ public class VideoUploadController {
             asset.setOriginalFileName(file.getOriginalFilename());
             asset.setSystemFileName(uniqueName);
 
-            MediaAsset savedAsset = mediaRepository.save(asset);
+            mediaRepository.save(asset);
 
-            return ResponseEntity.status(HttpStatus.CREATED).body(savedAsset);
+            return ResponseEntity.status(HttpStatus.CREATED).body("Video successfully uploaded");
         }
+
+        catch(InvalidFileType e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+
         catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal Server Error");
         }
-        
     }
 }

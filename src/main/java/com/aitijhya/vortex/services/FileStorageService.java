@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.aitijhya.vortex.exceptions.InvalidFileType;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,6 +15,7 @@ import java.util.UUID;
 @Service
 public class FileStorageService {
     private final Path uploadDirPath;
+    private final String MP4_EXTENSION = ".mp4";
 
     public FileStorageService(@Value("${vortex.upload-dir}") String dirPath) {
         uploadDirPath = Path.of(dirPath);
@@ -33,10 +36,12 @@ public class FileStorageService {
         return name.substring(name.lastIndexOf("."));
     }
 
-    public String saveFile(MultipartFile file) {
+    public String saveFile(MultipartFile file) throws InvalidFileType {
         try {
             String name = file.getOriginalFilename();
             String extension = getFileExtension(name);
+
+            if (!MP4_EXTENSION.equals(extension)) throw new InvalidFileType();
 
             String uniqueName = UUID.randomUUID() + extension;
             Path targetPath = uploadDirPath.resolve(uniqueName);
@@ -44,7 +49,6 @@ public class FileStorageService {
             Files.copy(file.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
             return uniqueName;
         }
-
         catch (IOException e) {
             throw new RuntimeException("Failed to copy file to hard disk: " + e.getMessage());
         }
