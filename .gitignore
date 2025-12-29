@@ -5,3 +5,5 @@ settings.json
 aitijhyamodak
 target
 .vscode
+.env
+vortex-data
